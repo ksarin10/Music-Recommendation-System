@@ -11,13 +11,13 @@ import os
 
 
 app = Flask(__name__)
-# CORS setup
+
 CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 app.config['WTF_CSRF_ENABLED'] = False
 
 
-client_id = '1e6eafb930cd48d69beb4e52dd4e2e4c'
-client_secret = '32e469512632402894016e53345c1757'
+client_id = 'CLIENT_ID'
+client_secret = 'CLIENT_SECRET'
 auth_manager = SpotifyClientCredentials(
     client_id=client_id, client_secret=client_secret)
 sp = spotipy.Spotify(auth_manager=auth_manager)
@@ -114,7 +114,7 @@ def weighted_knn_distances(song_features, feature_weights):
 
 
 def update_recommendations(user_feedback, song_uri, liked_songs, disliked_songs, df, feature_weights):
-    global recommended_songs  # Use a global list to track recommendations for the session
+    global recommended_songs  
 
     song_index = df.index[df['uri'] == song_uri].tolist()
     if not song_index:
@@ -139,7 +139,6 @@ def update_recommendations(user_feedback, song_uri, liked_songs, disliked_songs,
     attempts = 0
     next_recommendation = None
 
-    # Track songs already recommended in the current session
     session_recommended_songs = set(recommended_songs)
 
     while attempts < 5:
@@ -149,10 +148,8 @@ def update_recommendations(user_feedback, song_uri, liked_songs, disliked_songs,
 
         if next_recommendation_list:
             next_recommendation = next_recommendation_list[0]
-            # Check if the song has already been recommended in the session
             if next_recommendation['uri'] != song_uri and next_recommendation['uri'] not in session_recommended_songs:
                 session_recommended_songs.add(next_recommendation['uri'])
-                # Add it to global tracking list
                 recommended_songs.append(next_recommendation['uri'])
                 break
         attempts += 1
